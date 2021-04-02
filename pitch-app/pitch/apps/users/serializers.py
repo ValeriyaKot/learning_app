@@ -1,15 +1,32 @@
-from django.contrib.auth import get_user_model
+from django.contrib.auth.models import User
 from rest_framework.authtoken.models import Token
 from rest_framework import serializers
-from django.contrib.auth import get_user_model, password_validation
+from django.contrib.auth import password_validation
 from django.contrib.auth.models import BaseUserManager
+from .models import Profile
 
-User = get_user_model()
+
+class ProfileSerializer(serializers.ModelSerializer):
+    user = serializers.StringRelatedField()
+
+    class Meta:
+        model = Profile
+        fields = ('birthday', 'role', 'user')
+
 
 class UserRegisterSerializer(serializers.ModelSerializer):
+    profile = ProfileSerializer()
+
     class Meta:
         model = User
-        fields = ('id', 'username', 'email', 'password', 'first_name', 'last_name')
+        fields = ('id', 'username', 'email', 'password', 'first_name', 'last_name', 'profile')
+
+    def create(self, validated_data):
+        profile_data = validated_data.pop('profile')
+        user = User.objects.create(**validated_data)
+        for profile in profile_data:
+            Profile.objects.create(user=user, **profile)
+        return user
 
     def validate_email(self, value):
         user = User.objects.filter(email=value)
@@ -28,11 +45,12 @@ class UserLoginSerializer(serializers.Serializer):
 
 
 class AuthUserSerializer(serializers.ModelSerializer):
+    profile = ProfileSerializer()
     auth_token = serializers.SerializerMethodField()
 
     class Meta:
         model = User
-        fields = ('id', 'username', 'email', 'first_name', 'last_name', 'is_active', 'is_staff', 'auth_token')
+        fields = ('id', 'username', 'email', 'first_name', 'last_name', 'is_active', 'is_staff', 'auth_token', 'profile')
         read_only_fields = ('id', 'is_active', 'is_staff')
 
     def get_auth_token(self, obj):

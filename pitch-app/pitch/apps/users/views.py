@@ -5,6 +5,7 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from . import serializers
+from .models import Profile
 from .utils import get_and_authenticate_user, create_user_account
 
 
@@ -56,3 +57,15 @@ class AuthViewSet(viewsets.GenericViewSet):
             return self.serializer_classes[self.action]
         return super().get_serializer_class()
 
+
+class ProfileViewSet(viewsets.ModelViewSet):
+    # queryset = Profile.objects.all()
+    serializer_class = serializers.ProfileSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        return Profile.objects.filter(user=self.request.user)
+
+    # def perform_create(self, serializer):
+    #     user = self.request.user
+    #     serializer.save(user=user)
