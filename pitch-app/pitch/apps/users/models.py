@@ -6,6 +6,6 @@ from .constants import ROLE_CHOICES
 
 
 class Profile(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
     birthday = models.DateField(validators=[MaxValueValidator(datetime.now().date())])
     role = models.CharField(max_length=250, choices=ROLE_CHOICES)
