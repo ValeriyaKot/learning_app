@@ -34,6 +34,7 @@ class CourseDetailView(generics.RetrieveUpdateDestroyAPIView, viewsets.GenericVi
     permission_classes = [IsAuthenticated, IsTeacherOrReadOnly]
 
 
+
 class ModuleView(viewsets.ModelViewSet):
     queryset = Module.objects.all()
     serializer_class = serializers.ModuleSerializer
@@ -46,22 +47,4 @@ class MaterialView(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated, IsTeacherOrReadOnly]
 
 
-class GetQuestion(GenericAPIView):
-    permission_classes = (IsAuthenticated,)
-    serializer_class = serializers.QuestionSerializer
 
-    def get(self, request):
-        questions = Question.objects.filter(visible=True)
-        last_point = serializers.QuestionSerializer(questions, many=True)
-        return Response(last_point.data)
-
-
-class QuestionAnswer(GenericAPIView):
-    permission_classes = (IsAuthenticated,)
-    serializer_class = serializers.AnswerSerializer
-
-    def post(self, request):
-        answer = serializers.AnswerSerializer(data=request.data, context=request)
-        if answer.is_valid(raise_exception=True):
-            answer.save()
-            return Response({'result': 'OK'})

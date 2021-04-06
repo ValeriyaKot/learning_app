@@ -13,7 +13,7 @@ class MaterialSerializer(serializers.ModelSerializer):
 
 class ModuleSerializer(serializers.ModelSerializer):
     # course = serializers.StringRelatedField(read_only=True)
-    # materials = MaterialSerializer(many=True, read_only=True)
+    materials = MaterialSerializer(many=True, read_only=True)
 
     class Meta:
         model = models.Module
@@ -29,7 +29,7 @@ class ModuleSerializer(serializers.ModelSerializer):
 
 class CourseSerializer(serializers.ModelSerializer):
     teacher = ProfileSerializer(read_only=True)
-    # modules = ModuleSerializer(many=True)
+    modules = ModuleSerializer(many=True, read_only=True)
 
     class Meta:
         model = models.Course
@@ -67,47 +67,3 @@ class CourseDetailSerializer(serializers.ModelSerializer):
 
 
 
-
-class AnswerSerializer(serializers.ModelSerializer):
-    percent = serializers.SerializerMethodField()
-
-    class Meta:
-        model = models.Answer
-        fields = '__all__'
-
-    def get_percent(self, obj):
-        total = models.StudentAnswer.objects.filter(question=obj.question).count()
-        current = models.StudentAnswer.objects.filter(question=obj.question, answer=obj).count()
-        if total != 0:
-            return float(current * 100 / total)
-        else:
-            return float(0)
-
-
-class QuestionSerializer(serializers.ModelSerializer):
-    answer = AnswerSerializer(many=True, source='answer_set', )
-
-    class Meta:
-        model = models.Question
-        fields = '__all__'
-
-
-class StudentAnswerSerializer(serializers.Serializer):
-    answers = serializers.JSONField()
-
-    def validate_answers(self, answers):
-        if not answers:
-            raise serializers.ValidationError("Answers must be not null.")
-        return answers
-
-    def save(self):
-        answers = self.data['answers']
-        user = self.context.user
-        for question_id in answers:
-            question = models.Question.objects.get(pk=question_id)
-            answers = answers[question_id]
-            for answer_id in answers:
-                answer = models.Answer.objects.get(pk=answer_id)
-                models.Answer(user=user, question=question, answer=answer).save()
-                user.is_answer = True
-                user.save()
