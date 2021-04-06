@@ -66,9 +66,3 @@ class CourseDetailSerializer(serializers.ModelSerializer):
         model = models.Course
         fields = '__all__'
 
-
-class EnrollCourseSerializer(serializers.ModelSerializer):
-
-    class Meta:
-        models = models.Course
-        fields = ['students']
