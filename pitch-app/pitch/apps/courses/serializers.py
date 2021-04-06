@@ -60,10 +60,15 @@ class CourseSerializer(serializers.ModelSerializer):
 
 class CourseDetailSerializer(serializers.ModelSerializer):
     teacher = ProfileSerializer(read_only=True)
+    students = ProfileSerializer(read_only=True, many=True)
 
     class Meta:
         model = models.Course
         fields = '__all__'
 
 
+class EnrollCourseSerializer(serializers.ModelSerializer):
 
+    class Meta:
+        models = models.Course
+        fields = ['students']

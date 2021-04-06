@@ -34,6 +34,13 @@ class CourseDetailView(generics.RetrieveUpdateDestroyAPIView, viewsets.GenericVi
     permission_classes = [IsAuthenticated, IsTeacherOrReadOnly]
 
 
+class EnrollCourse(APIView):
+    def post(self, request, pk):
+        course = get_object_or_404(Course, pk=pk)
+        profile = Profile.objects.get(user=request.user)
+        course.students.add(profile)
+        return Response(status=status.HTTP_201_CREATED)
+
 
 class ModuleView(viewsets.ModelViewSet):
     queryset = Module.objects.all()

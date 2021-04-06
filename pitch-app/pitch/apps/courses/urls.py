@@ -10,10 +10,7 @@ router.register('pitch/modules', views.ModuleView, basename='modules')
 router.register('pitch/materials', views.MaterialView, basename='materials')
 
 
-urlpatterns = router.urls
-
-
-# urlpatterns = [
-#     # path('pitch/courses/', views.CourseView.as_view()),
-#     # path('pitch/add_course/', views.CourseAddView.as_view()),
-# ]
+urlpatterns = router.urls + [
+    path('pitch/<int:pk>/enroll', views.EnrollCourse.as_view(), name='enroll_course')
+]
+    # path('pitch/add_course/', views.CourseAddView.as_view()),
