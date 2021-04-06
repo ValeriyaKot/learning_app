@@ -16,8 +16,7 @@ class Module(Timestampable):
 
 
 class Material(Timestampable):
-    module = models.ForeignKey(Module, on_delete=models.CASCADE)
-    title = models.CharField(max_length=250)
+    module = models.ForeignKey(Module,  related_name='materials', on_delete=models.CASCADE)
     text = models.TextField()
 
 
