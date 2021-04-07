@@ -12,7 +12,6 @@ from .utils import get_and_authenticate_user, create_user_account
 class AuthViewSet(viewsets.GenericViewSet):
     queryset = ''
     permission_classes = [AllowAny, ]
-    serializer_class = serializers.EmptySerializer
     serializer_classes = {
         'login': serializers.UserLoginSerializer,
         'register': serializers.UserRegisterSerializer,
@@ -59,13 +58,8 @@ class AuthViewSet(viewsets.GenericViewSet):
 
 
 class ProfileViewSet(viewsets.ModelViewSet):
-    # queryset = Profile.objects.all()
     serializer_class = serializers.ProfileSerializer
     permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
         return Profile.objects.filter(user=self.request.user)
-
-    # def perform_create(self, serializer):
-    #     user = self.request.user
-    #     serializer.save(user=user)

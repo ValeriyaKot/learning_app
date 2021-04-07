@@ -1,14 +1,12 @@
-from django.http import Http404
-
-from . import serializers
 from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated
-from rest_framework.generics import GenericAPIView, get_object_or_404
+from rest_framework.generics import get_object_or_404
+from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework import status, viewsets, generics, mixins
-from .models import Question, Course, Module, Material
 from apps.users.models import Profile
-from rest_framework.decorators import action
+from . import serializers
+from .models import Course, Module, Material
 from .permissions import IsTeacherOrReadOnly
 
 
@@ -52,6 +50,3 @@ class MaterialView(viewsets.ModelViewSet):
     queryset = Material.objects.all()
     serializer_class = serializers.MaterialSerializer
     permission_classes = [IsAuthenticated, IsTeacherOrReadOnly]
-
-
-

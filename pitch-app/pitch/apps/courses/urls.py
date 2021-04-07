@@ -1,5 +1,4 @@
 from django.urls import path
-from . import views
 from rest_framework import routers
 from . import views
 
@@ -13,4 +12,3 @@ router.register('pitch/materials', views.MaterialView, basename='materials')
 urlpatterns = router.urls + [
     path('pitch/<int:pk>/enroll', views.EnrollCourse.as_view(), name='enroll_course')
 ]
-    # path('pitch/add_course/', views.CourseAddView.as_view()),
