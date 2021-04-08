@@ -1,5 +1,5 @@
 from rest_framework.views import APIView
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.generics import get_object_or_404
 from rest_framework.decorators import action
 from rest_framework.response import Response
@@ -26,16 +26,21 @@ class CourseView(mixins.ListModelMixin, viewsets.GenericViewSet):
         return Response('Course can add only teacher', status=status.HTTP_400_BAD_REQUEST)
 
 
-class CourseEditView(generics.RetrieveUpdateDestroyAPIView, viewsets.GenericViewSet):
+class CourseDetailView(generics.RetrieveUpdateDestroyAPIView, viewsets.GenericViewSet):
     queryset = Course.objects.all()
     serializer_class = serializers.CourseDetailSerializer
-    permission_classes = [IsAuthenticated, IsTeacherOrReadOnly]
+    permission_classes_by_action = {
+        'retrieve': [AllowAny],
+        'update': [IsAuthenticated, IsTeacherOrReadOnly],
+        'destroy': [IsAuthenticated, IsTeacherOrReadOnly],
+        'partial_update': [IsAuthenticated, IsTeacherOrReadOnly],
+    }
 
-
-class CourseDetailView(generics.RetrieveAPIView, viewsets.GenericViewSet):
-    queryset = Course.objects.all()
-    serializer_class = serializers.CourseDetailSerializer
-    permission_classes = [IsAuthenticated]
+    def get_permissions(self):
+        try:
+            return [permission() for permission in self.permission_classes_by_action[self.action]]
+        except KeyError:
+            return [permission() for permission in self.permission_classes]
 
 
 class EnrollCourse(APIView):
