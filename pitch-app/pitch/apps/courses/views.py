@@ -18,18 +18,24 @@ class CourseView(mixins.ListModelMixin, viewsets.GenericViewSet):
     @action(methods=['POST', ], detail=False)
     def add_course(self, request):
         serializer = serializers.CourseSerializer(data=request.data)
-        teacher = Profile.objects.get(user=request.user)
+        profile = Profile.objects.get(user=request.user)
         if serializer.is_valid():
-            if teacher.role == 'teacher':
-                serializer.save(teacher=teacher)
+            if profile.role == 'teacher':
+                serializer.save(teacher=profile)
                 return Response(serializer.data, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        return Response('Course can add only teacher', status=status.HTTP_400_BAD_REQUEST)
 
 
-class CourseDetailView(generics.RetrieveUpdateDestroyAPIView, viewsets.GenericViewSet):
+class CourseEditView(generics.RetrieveUpdateDestroyAPIView, viewsets.GenericViewSet):
     queryset = Course.objects.all()
     serializer_class = serializers.CourseDetailSerializer
     permission_classes = [IsAuthenticated, IsTeacherOrReadOnly]
+
+
+class CourseDetailView(generics.RetrieveAPIView, viewsets.GenericViewSet):
+    queryset = Course.objects.all()
+    serializer_class = serializers.CourseDetailSerializer
+    permission_classes = [IsAuthenticated]
 
 
 class EnrollCourse(APIView):
@@ -43,7 +49,7 @@ class EnrollCourse(APIView):
 class ModuleView(viewsets.ModelViewSet):
     queryset = Module.objects.all()
     serializer_class = serializers.ModuleSerializer
-    permission_classes = [IsAuthenticated, IsTeacherOrReadOnly]
+    permission_classes = (IsAuthenticated, IsTeacherOrReadOnly,)
 
 
 class MaterialView(viewsets.ModelViewSet):
