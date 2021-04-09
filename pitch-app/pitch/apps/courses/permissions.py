@@ -11,5 +11,5 @@ class IsTeacherOrReadOnly(BasePermission):
 
     def has_object_permission(self, request, view, obj):
         if request.method in SAFE_METHODS:
-            return request.data
+            return True
         return obj
