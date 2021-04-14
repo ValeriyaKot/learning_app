@@ -40,7 +40,8 @@ INSTALLED_APPS = [
     'rest_framework.authtoken',
     'rest_framework',
     'apps.users',
-    'apps.courses'
+    'apps.courses',
+    'apps.quizzes'
 ]
 
 MIDDLEWARE = [

@@ -5,8 +5,11 @@ from .behavior import Timestampable
 
 class Course(Timestampable):
     teacher = models.ForeignKey(Profile, on_delete=models.CASCADE)
-    students = models.ManyToManyField(Profile, related_name='students_of_course')
+    students = models.ManyToManyField(Profile, related_name='course_students')
     title = models.CharField(max_length=250)
+
+    def __str__(self):
+        return self.title
 
 
 class Module(Timestampable):
@@ -18,24 +21,3 @@ class Module(Timestampable):
 class Material(Timestampable):
     module = models.ForeignKey(Module,  related_name='materials', on_delete=models.CASCADE)
     text = models.TextField()
-
-
-class Test(models.Model):
-    title = models.CharField(max_length=250)
-    course = models.ForeignKey(Course, on_delete=models.CASCADE)
-
-
-class Question(models.Model):
-    text = models.TextField()
-    test = models.ForeignKey(Test, on_delete=models.CASCADE)
-
-
-class Answer(models.Model):
-    answer = models.TextField()
-    question = models.ForeignKey(Question, on_delete=models.DO_NOTHING)
-
-
-class StudentAnswer(models.Model):
-    profile = models.ForeignKey(Profile, on_delete=models.DO_NOTHING)
-    question = models.ForeignKey(Question, on_delete=models.DO_NOTHING)
-    answer = models.ForeignKey(Answer, on_delete=models.DO_NOTHING)

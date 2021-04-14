@@ -29,6 +29,7 @@ class CourseView(mixins.ListModelMixin, viewsets.GenericViewSet):
 class CourseDetailView(generics.RetrieveUpdateDestroyAPIView, viewsets.GenericViewSet):
     queryset = Course.objects.all()
     serializer_class = serializers.CourseDetailSerializer
+    permission_classes = [IsAuthenticated]
     permission_classes_by_action = {
         'retrieve': [AllowAny],
         'update': [IsAuthenticated, IsTeacherOrReadOnly],
@@ -54,7 +55,7 @@ class EnrollCourse(APIView):
 class ModuleView(viewsets.ModelViewSet):
     queryset = Module.objects.all()
     serializer_class = serializers.ModuleSerializer
-    permission_classes = (IsAuthenticated, IsTeacherOrReadOnly,)
+    permission_classes = [IsAuthenticated, IsTeacherOrReadOnly]
 
 
 class MaterialView(viewsets.ModelViewSet):
