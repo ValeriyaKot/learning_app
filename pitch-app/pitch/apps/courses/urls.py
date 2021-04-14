@@ -5,8 +5,7 @@ from . import views
 router = routers.SimpleRouter()
 router.register('pitch/courses', views.CourseView, basename='courses')
 router.register('pitch/courses', views.CourseDetailView, basename='course-detail')
-router.register('pitch/courses/modules', views.ModuleView, basename='modules')
-router.register('pitch/courses/materials', views.MaterialView, basename='materials')
+router.register('pitch/modules', views.ModuleView, basename='modules')
 
 
 urlpatterns = router.urls + [

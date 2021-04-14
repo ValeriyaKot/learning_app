@@ -6,15 +6,22 @@ from . import models
 class MaterialSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.Material
-        fields = '__all__'
+        fields = ['text']
 
 
 class ModuleSerializer(serializers.ModelSerializer):
-    materials = MaterialSerializer(many=True, read_only=True)
+    materials = MaterialSerializer(many=True)
 
     class Meta:
         model = models.Module
         fields = '__all__'
+
+    def create(self, validated_data):
+        materials_data = validated_data.pop('materials')
+        module = models.Module.objects.create(**validated_data)
+        for material_data in materials_data:
+            models.Material.objects.create(module=module, **material_data)
+        return module
 
 
 class CourseSerializer(serializers.ModelSerializer):
