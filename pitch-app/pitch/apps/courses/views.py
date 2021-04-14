@@ -23,7 +23,7 @@ class CourseView(mixins.ListModelMixin, viewsets.GenericViewSet):
             if profile.role == 'teacher':
                 serializer.save(teacher=profile)
                 return Response(serializer.data, status=status.HTTP_201_CREATED)
-        return Response('Course can add only teacher', status=status.HTTP_400_BAD_REQUEST)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 class CourseDetailView(generics.RetrieveUpdateDestroyAPIView, viewsets.GenericViewSet):
