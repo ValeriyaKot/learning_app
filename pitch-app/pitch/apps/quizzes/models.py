@@ -32,3 +32,11 @@ class TestResult(models.Model):
     profile = models.ForeignKey(Profile, on_delete=models.CASCADE)
     test = models.ForeignKey(Test, on_delete=models.CASCADE)
     result = models.IntegerField()
+
+
+class StudentAnswer(models.Model):
+    profile = models.ForeignKey(Profile, on_delete=models.CASCADE, related_name='student_answer')
+    answer = models.TextField()
+    question = models.ForeignKey(Question, on_delete=models.CASCADE)
+    test = models.ForeignKey(Test, on_delete=models.CASCADE)
+    correct_answer = models.TextField()
