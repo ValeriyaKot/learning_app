@@ -1,3 +1,5 @@
 from django.contrib import admin
+from .models import StudentAnswer, TestResult
 
-# Register your models here.
+admin.site.register(StudentAnswer)
+admin.site.register(TestResult)

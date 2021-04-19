@@ -48,3 +48,13 @@ class TestResultSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.TestResult
         fields = '__all__'
+
+
+class AnswersSerializer(serializers.ModelSerializer):
+    profile = serializers.StringRelatedField(read_only=True)
+    test = serializers.StringRelatedField(read_only=True)
+    question = serializers.StringRelatedField(read_only=True)
+
+    class Meta:
+        model = models.StudentAnswer
+        fields = '__all__'
