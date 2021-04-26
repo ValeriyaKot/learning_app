@@ -49,7 +49,7 @@ class EnrollCourse(APIView):
         course = get_object_or_404(Course, pk=pk)
         profile = Profile.objects.get(user=request.user)
         course.students.add(profile)
-        return Response(status=status.HTTP_201_CREATED)
+        return Response(course, status=status.HTTP_201_CREATED)
 
 
 class ModuleView(viewsets.ModelViewSet):
