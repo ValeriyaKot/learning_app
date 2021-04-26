@@ -36,6 +36,7 @@ class CourseSerializer(serializers.ModelSerializer):
 class CourseDetailSerializer(serializers.ModelSerializer):
     teacher = ProfileSerializer(read_only=True)
     students = ProfileSerializer(read_only=True, many=True)
+    modules = ModuleSerializer(many=True, read_only=True)
 
     class Meta:
         model = models.Course
