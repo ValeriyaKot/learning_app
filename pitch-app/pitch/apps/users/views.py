@@ -30,7 +30,11 @@ class AuthViewSet(viewsets.GenericViewSet):
     def register(self, request):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
+        profile_data = serializer.validated_data.pop('profile')
         user = create_user_account(**serializer.validated_data)
+        user.profile.birthday = profile_data['birthday']
+        user.profile.role = profile_data['role']
+        user.save()
         data = serializers.AuthUserSerializer(user).data
         return Response(data=data, status=status.HTTP_201_CREATED)
 

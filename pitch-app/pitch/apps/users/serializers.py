@@ -1,13 +1,15 @@
-from django.contrib.auth.models import User
+from django.contrib.auth import get_user_model
 from rest_framework.authtoken.models import Token
 from rest_framework import serializers
 from django.contrib.auth import password_validation
 from django.contrib.auth.models import BaseUserManager
 from .models import Profile
 
+User = get_user_model()
+
 
 class ProfileSerializer(serializers.ModelSerializer):
-    user = serializers.StringRelatedField()
+    user = serializers.StringRelatedField(read_only=True)
 
     class Meta:
         model = Profile
@@ -20,13 +22,6 @@ class UserRegisterSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ('id', 'username', 'email', 'password', 'first_name', 'last_name', 'profile')
-
-    def create(self, validated_data):
-        profile_data = validated_data.pop('profile')
-        user = User.objects.create(**validated_data)
-        for profile in profile_data:
-            Profile.objects.create(user=user, **profile)
-        return user
 
     def validate_email(self, value):
         user = User.objects.filter(email=value)
