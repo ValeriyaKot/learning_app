@@ -38,17 +38,17 @@ class TestCourse:
 
     def test_update(self, api_client):
         user = UserFactory()
-        CourseFactory(teacher=user.profile)
+        course = CourseFactory(teacher=user.profile)
         course_data = {'title': 'Course number 2'}
         get_token(api_client, user)
-        response = api_client.put(f'{self.url}1/', data=course_data, format='json')
+        response = api_client.put(f'{self.url}{course.pk}/', data=course_data, format='json')
         assert response.status_code == status.HTTP_200_OK
         assert json.loads(response.content)['title'] == course_data['title']
 
     def test_delete(self, api_client):
         user = UserFactory()
-        CourseFactory(teacher=user.profile)
+        course = CourseFactory(teacher=user.profile)
         get_token(api_client, user)
-        response = api_client.delete(f'{self.url}1/')
+        response = api_client.delete(f'{self.url}{course.pk}/')
         assert response.status_code == 204
         assert Course.objects.all().count() == 0
