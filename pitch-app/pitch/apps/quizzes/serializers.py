@@ -55,21 +55,21 @@ class TestSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
-class TestResultSerializer(serializers.ModelSerializer):
-    test = serializers.StringRelatedField(read_only=True)
-    profile = serializers.StringRelatedField(read_only=True)
-
-    class Meta:
-        model = models.TestResult
-        fields = '__all__'
-
-
 class AnswersSerializer(serializers.ModelSerializer):
-    profile = serializers.StringRelatedField(read_only=True)
-    test = serializers.StringRelatedField(read_only=True)
     question = serializers.StringRelatedField(read_only=True)
     correct_answer = serializers.StringRelatedField(read_only=True)
 
     class Meta:
         model = models.StudentAnswer
         fields = '__all__'
+
+
+class TestResultSerializer(serializers.ModelSerializer):
+    test = serializers.StringRelatedField(read_only=True)
+    profile = serializers.StringRelatedField(read_only=True)
+    student_answers = AnswersSerializer(read_only=True, many=True)
+
+    class Meta:
+        model = models.TestResult
+        fields = '__all__'
+        

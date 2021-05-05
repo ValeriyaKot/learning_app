@@ -4,7 +4,6 @@ from django.db.models.signals import post_save
 from rest_framework.test import APIClient
 from django.contrib.auth.models import User
 from apps.users.models import Profile
-from pytest_factoryboy import register
 from rest_framework.authtoken.models import Token
 from django.contrib.auth.hashers import make_password
 
@@ -42,4 +41,3 @@ class UserFactory(factory.django.DjangoModelFactory):
     first_name = 'Tommy'
     last_name = 'West'
     profile = factory.RelatedFactory(ProfileFactory, factory_related_name='user')
-

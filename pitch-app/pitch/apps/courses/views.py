@@ -12,7 +12,7 @@ from .permissions import IsTeacherOrReadOnly
 
 class CourseView(mixins.ListModelMixin, viewsets.GenericViewSet):
     queryset = Course.objects.all()
-    permission_classes = [IsAuthenticated]
+    permission_classes = [AllowAny]
     serializer_class = serializers.CourseSerializer
 
     @action(methods=['POST', ], detail=False)

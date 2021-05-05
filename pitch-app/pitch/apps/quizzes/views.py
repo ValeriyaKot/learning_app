@@ -31,13 +31,11 @@ class CheckResultView(APIView):
         test = Test.objects.get(pk=data['test_id'])
         serializer = serializers.CheckResultSerializer(data=data)
         if serializer.is_valid():
-            write_student_answer(student_answers, test, profile)
             result = calculate_result(student_answers)
-            TestResult.objects.create(result=result, profile=profile, test=test)
+            test_result = TestResult.objects.create(result=result, profile=profile, test=test)
+            write_student_answer(student_answers, test_result)
             return Response(result, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-
 
 
 class TestResultView(APIView):
@@ -54,6 +52,5 @@ class StudentAnswersView(mixins.ListModelMixin, viewsets.GenericViewSet):
     serializer_class = serializers.AnswersSerializer
 
     def get_queryset(self):
-        profile = Profile.objects.get(user=self.request.user)
-        student_answers = StudentAnswer.objects.filter(profile=profile)
+        student_answers = StudentAnswer.objects.all()
         return student_answers

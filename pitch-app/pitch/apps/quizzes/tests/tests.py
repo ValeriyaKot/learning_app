@@ -98,6 +98,7 @@ class TestQuestion:
         question = QuestionFactory(test=test)
         AnswerFactory(question=question)
         question_data = {'text': 'What is correct?', 'test': test.pk, 'answers': [{"text": "a", "is_correct": False}]}
+        get_token(api_client, user)
         response = api_client.put(f'{self.url}{question.pk}/', data=question_data, format='json')
         assert response.status_code == status.HTTP_200_OK
         assert json.loads(response.content)['text'] == question_data['text']

@@ -1,9 +1,5 @@
 import pytest
-import json
-from django.contrib.auth.models import User
 from rest_framework import status
-from rest_framework.authtoken.models import Token
-
 from .conftest import UserFactory, get_token
 
 

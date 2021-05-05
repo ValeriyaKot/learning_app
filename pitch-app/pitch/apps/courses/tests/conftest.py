@@ -12,7 +12,6 @@ class CourseFactory(factory.django.DjangoModelFactory):
     id = 1
     teacher = factory.SubFactory(ProfileFactory, course=None)
     title = 'Course N1'
-    # module = factory.SubFactory('apps.courses.tests.conftest.CourseFactory', course=None)
 
 
 class ModuleFactory(factory.django.DjangoModelFactory):
@@ -23,7 +22,6 @@ class ModuleFactory(factory.django.DjangoModelFactory):
     title = 'Module N1'
     description = 'Elephant fish sweeper freshwater hatchet fish'
     course = factory.SubFactory(CourseFactory, module=None, factory_related_name='module')
-    # material = factory.SubFactory('apps.users.MaterialFactory', module=None)
 
 
 class MaterialFactory(factory.django.DjangoModelFactory):

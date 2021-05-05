@@ -10,15 +10,15 @@ def get_answers(student_answers):
     return answers
 
 
-def write_student_answer(student_answers, test, profile):
+def write_student_answer(student_answers, test_result):
     answer_list = get_answers(student_answers)
     for answer in answer_list:
         correct_answer = Answer.objects.get(is_correct=True, question=answer['question'])
         StudentAnswer.objects.create(question=answer['question'],
                                      answer=answer['answer'],
                                      correct_answer=correct_answer,
-                                     test=test,
-                                     profile=profile)
+                                     test_result=test_result
+                                     )
 
 
 def calculate_result(student_answers):
