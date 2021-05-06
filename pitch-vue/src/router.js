@@ -2,6 +2,8 @@ import Vue from 'vue'
 import Router from 'vue-router'
 import Courses from './views/Courses.vue'
 import CourseDetail from './views/CourseDetail.vue'
+import Test from './views/Test.vue'
+
 
 Vue.use(Router)
 
@@ -23,6 +25,13 @@ export default new Router({
     {
       path: '/pitch/courses/:id',
       component: CourseDetail 
+    },
+    {
+      path: '/pitch/tests/:id',
+      component: Test,
+      meta: { 
+        requiresAuth: true
+      }
     }
   ]
 })

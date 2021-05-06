@@ -7,6 +7,7 @@
                 v-bind:course="course"
             />
         </div>
+        <b-button variant="secondary" href="#">add course</b-button>
         <router-view></router-view>
     </div>
 </template>

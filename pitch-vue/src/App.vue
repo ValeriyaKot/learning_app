@@ -2,6 +2,7 @@
   <div id="app">
     <Nav />
     <router-view />
+    <span v-if="isLoggedIn"> | <a @click="logout">Logout</a></span>
     <!-- <Footer /> -->
   </div>
 </template>

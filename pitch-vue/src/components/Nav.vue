@@ -19,7 +19,7 @@
             </b-nav-form>
 
             <b-navbar-nav right>
-                <b-nav-item href="/login">Log in</b-nav-item>
+                <b-nav-item href="/pitch/login">Log in</b-nav-item>
             </b-navbar-nav>
         </b-navbar-nav>
         </b-collapse>
