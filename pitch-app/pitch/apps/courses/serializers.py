@@ -1,6 +1,7 @@
 from rest_framework import serializers
 from apps.users.serializers import ProfileSerializer
 from . import models
+from apps.quizzes.serializers import TestSerializer
 
 
 class MaterialSerializer(serializers.ModelSerializer):
@@ -37,6 +38,7 @@ class CourseDetailSerializer(serializers.ModelSerializer):
     teacher = ProfileSerializer(read_only=True)
     students = ProfileSerializer(read_only=True, many=True)
     modules = ModuleSerializer(many=True, read_only=True)
+    tests = TestSerializer(many=True, read_only=True)
 
     class Meta:
         model = models.Course

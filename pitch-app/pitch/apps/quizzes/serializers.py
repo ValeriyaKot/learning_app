@@ -72,4 +72,3 @@ class TestResultSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.TestResult
         fields = '__all__'
-        
