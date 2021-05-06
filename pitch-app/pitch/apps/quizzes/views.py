@@ -6,7 +6,7 @@ from apps.users.models import Profile
 from apps.courses.permissions import IsTeacherOrReadOnly
 from .models import Test, Question, TestResult, StudentAnswer
 from . import serializers
-from .utils import write_student_answer, calculate_result
+from .utils import write_student_answer, calculate_result, check_attempts
 
 
 class TestView(viewsets.ModelViewSet):
@@ -31,10 +31,13 @@ class CheckResultView(APIView):
         test = Test.objects.get(pk=data['test_id'])
         serializer = serializers.CheckResultSerializer(data=data)
         if serializer.is_valid():
-            result = calculate_result(student_answers)
-            test_result = TestResult.objects.create(result=result, profile=profile, test=test)
-            write_student_answer(student_answers, test_result)
-            return Response(result, status=status.HTTP_201_CREATED)
+            if check_attempts(profile, test):
+                result = calculate_result(student_answers)
+                test_result = TestResult.objects.create(result=result, profile=profile, test=test)
+                write_student_answer(student_answers, test_result)
+                return Response(result, status=status.HTTP_201_CREATED)
+            else:
+                return Response('You have run out of attempts', status=status.HTTP_400_BAD_REQUEST)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
@@ -45,12 +48,3 @@ class TestResultView(APIView):
         test_result = TestResult.objects.filter(profile=profile)
         serializer = serializers.TestResultSerializer(test_result, many=True)
         return Response(serializer.data)
-
-
-class StudentAnswersView(mixins.ListModelMixin, viewsets.GenericViewSet):
-    permission_classes = [IsAuthenticated]
-    serializer_class = serializers.AnswersSerializer
-
-    def get_queryset(self):
-        student_answers = StudentAnswer.objects.all()
-        return student_answers

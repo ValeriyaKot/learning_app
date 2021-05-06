@@ -5,8 +5,8 @@ from apps.users.models import Profile
 
 class Test(models.Model):
     title = models.CharField(max_length=250)
-    course = models.ForeignKey(Course, on_delete=models.CASCADE)
-    quantity = models.IntegerField(default=0)
+    course = models.ForeignKey(Course, on_delete=models.CASCADE, related_name='tests')
+    attempts_number = models.IntegerField(blank=True, null=True)
 
     def __str__(self):
         return self.title

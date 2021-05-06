@@ -1,4 +1,4 @@
-from .models import StudentAnswer, Question, Answer
+from .models import StudentAnswer, Question, Answer, TestResult
 
 
 def get_answers(student_answers):
@@ -29,3 +29,20 @@ def calculate_result(student_answers):
             if question_answer.is_correct and question_answer.text == answer['answer']:
                 result += 1
     return result
+
+
+def check_attempts(profile, test):
+    test_results = TestResult.objects.filter(profile=profile, test=test)
+    if test.attempts_number is not None:
+        if len(test_results) < test.attempts_number:
+            return True
+        elif len(test_results) >= test.attempts_number:
+            return False
+    else:
+        return True
+
+
+
+
+
+
