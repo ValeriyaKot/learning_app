@@ -1,5 +1,4 @@
 import factory
-import pytest
 from apps.quizzes import models
 
 
@@ -18,6 +17,7 @@ class QuestionFactory(factory.django.DjangoModelFactory):
 
     text = 'What is correct?'
     test = factory.SubFactory(TestFactory)
+
 
 class AnswerFactory(factory.django.DjangoModelFactory):
     class Meta:

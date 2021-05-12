@@ -14,10 +14,14 @@ def write_student_answer(student_answers, test_result):
     answer_list = get_answers(student_answers)
     for answer in answer_list:
         correct_answer = Answer.objects.get(is_correct=True, question=answer['question'])
+        is_correct = False
+        if answer['answer'] == correct_answer.text:
+            is_correct = True
         StudentAnswer.objects.create(question=answer['question'],
                                      answer=answer['answer'],
                                      correct_answer=correct_answer,
-                                     test_result=test_result
+                                     test_result=test_result,
+                                     is_correct=is_correct
                                      )
 
 
@@ -40,9 +44,3 @@ def check_attempts(profile, test):
             return False
     else:
         return True
-
-
-
-
-
-

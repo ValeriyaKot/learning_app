@@ -1,4 +1,3 @@
-import pytest
 import factory
 from apps.courses.models import Course, Module, Material
 from apps.users.tests.conftest import ProfileFactory
@@ -20,7 +19,6 @@ class ModuleFactory(factory.django.DjangoModelFactory):
 
     id = 1
     title = 'Module N1'
-    description = 'Elephant fish sweeper freshwater hatchet fish'
     course = factory.SubFactory(CourseFactory, module=None, factory_related_name='module')
 
 

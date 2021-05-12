@@ -13,7 +13,7 @@ class ProfileSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Profile
-        fields = ('birthday', 'role', 'user')
+        fields = "__all__"
 
 
 class UserRegisterSerializer(serializers.ModelSerializer):
@@ -41,10 +41,11 @@ class UserLoginSerializer(serializers.Serializer):
 
 class AuthUserSerializer(serializers.ModelSerializer):
     auth_token = serializers.SerializerMethodField()
+    profile = ProfileSerializer(read_only=True)
 
     class Meta:
         model = User
-        fields = ('id', 'username', 'email', 'first_name', 'last_name', 'auth_token')
+        fields = ('id', 'username', 'email', 'first_name', 'last_name', 'auth_token', 'profile')
 
     def get_auth_token(self, obj):
         refresh = RefreshToken.for_user(user=obj)
