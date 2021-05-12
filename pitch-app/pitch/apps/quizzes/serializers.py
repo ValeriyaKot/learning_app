@@ -72,3 +72,11 @@ class TestResultSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.TestResult
         fields = '__all__'
+
+
+class TestCourseSerializer(serializers.ModelSerializer):
+    questions = QuestionSerializer(many=True, read_only=True)
+
+    class Meta:
+        model = models.Test
+        fields = '__all__'

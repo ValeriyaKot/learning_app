@@ -1,18 +1,29 @@
+from django.shortcuts import get_object_or_404
 from rest_framework.views import APIView
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.response import Response
-from rest_framework import status, viewsets, mixins
+from rest_framework import status, viewsets
 from apps.users.models import Profile
 from apps.courses.permissions import IsTeacherOrReadOnly
-from .models import Test, Question, TestResult, StudentAnswer
+from .models import Test, Question, TestResult
 from . import serializers
 from .utils import write_student_answer, calculate_result, check_attempts
+from apps.courses.models import Course
 
 
 class TestView(viewsets.ModelViewSet):
-    queryset = Test.objects.all()
     permission_classes = [IsAuthenticated, IsTeacherOrReadOnly]
     serializer_class = serializers.TestSerializer
+    queryset = Test.objects.all()
+    permission_classes_by_action = {
+        'retrieve': [AllowAny]
+    }
+
+    def get_permissions(self):
+        try:
+            return [permission() for permission in self.permission_classes_by_action[self.action]]
+        except KeyError:
+            return [permission() for permission in self.permission_classes]
 
 
 class QuestionView(viewsets.ModelViewSet):
@@ -47,4 +58,14 @@ class TestResultView(APIView):
         profile = Profile.objects.get(user=request.user)
         test_result = TestResult.objects.filter(profile=profile)
         serializer = serializers.TestResultSerializer(test_result, many=True)
+        return Response(serializer.data)
+
+
+class TestCourseView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, pk):
+        course = get_object_or_404(Course, pk=pk)
+        tests = Test.objects.filter(course=course)
+        serializer = serializers.TestCourseSerializer(tests, many=True)
         return Response(serializer.data)

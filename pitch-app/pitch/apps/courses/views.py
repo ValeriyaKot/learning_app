@@ -11,12 +11,21 @@ from .permissions import IsTeacherOrReadOnly
 
 class CourseView(mixins.ListModelMixin, mixins.CreateModelMixin, viewsets.GenericViewSet):
     queryset = Course.objects.all()
-    permission_classes = [IsTeacherOrReadOnly]
+    permission_classes = [AllowAny]
     serializer_class = serializers.CourseSerializer
+    permission_classes_by_action = {
+        'create': [IsAuthenticated, IsTeacherOrReadOnly],
+    }
 
     def perform_create(self, serializer):
         profile = Profile.objects.get(user=self.request.user)
         serializer.save(teacher=profile)
+
+    def get_permissions(self):
+        try:
+            return [permission() for permission in self.permission_classes_by_action[self.action]]
+        except KeyError:
+            return [permission() for permission in self.permission_classes]
 
 
 class CourseDetailView(generics.RetrieveUpdateDestroyAPIView, viewsets.GenericViewSet):
@@ -57,3 +66,23 @@ class MaterialView(viewsets.ModelViewSet):
     queryset = Material.objects.all()
     serializer_class = serializers.MaterialSerializer
     permission_classes = [IsAuthenticated, IsTeacherOrReadOnly]
+
+
+class TeacherCourseView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        profile = Profile.objects.get(user=request.user)
+        courses = Course.objects.filter(teacher=profile)
+        serializer = serializers.TeacherCourseSerializer(courses, many=True)
+        return Response(serializer.data)
+
+
+class StudentEnrolledCourseView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        profile = Profile.objects.get(user=request.user)
+        courses = Course.objects.filter(students=profile)
+        serializer = serializers.CourseSerializer(courses, many=True)
+        return Response(serializer.data)

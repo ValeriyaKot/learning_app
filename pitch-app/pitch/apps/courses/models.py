@@ -7,6 +7,7 @@ class Course(Timestampable):
     teacher = models.ForeignKey(Profile, on_delete=models.CASCADE)
     students = models.ManyToManyField(Profile, related_name='course_students')
     title = models.CharField(max_length=250)
+    description = models.TextField(blank=True, null=True)
 
     def __str__(self):
         return self.title
@@ -15,7 +16,6 @@ class Course(Timestampable):
 class Module(Timestampable):
     course = models.ForeignKey(Course, related_name='modules', on_delete=models.CASCADE)
     title = models.CharField(max_length=250)
-    description = models.TextField(blank=True, null=True)
 
 
 class Material(Timestampable):
