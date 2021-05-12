@@ -42,5 +42,4 @@ def check_attempts(profile, test):
             return True
         elif len(test_results) >= test.attempts_number:
             return False
-    else:
-        return True
+    return True

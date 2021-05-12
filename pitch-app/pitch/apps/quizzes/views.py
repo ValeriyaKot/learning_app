@@ -16,7 +16,7 @@ class TestView(viewsets.ModelViewSet):
     serializer_class = serializers.TestSerializer
     queryset = Test.objects.all()
     permission_classes_by_action = {
-        'retrieve': [AllowAny]
+        'retrieve': [IsAuthenticated]
     }
 
     def get_permissions(self):
@@ -47,8 +47,7 @@ class CheckResultView(APIView):
                 test_result = TestResult.objects.create(result=result, profile=profile, test=test)
                 write_student_answer(student_answers, test_result)
                 return Response(result, status=status.HTTP_201_CREATED)
-            else:
-                return Response('You have run out of attempts', status=status.HTTP_400_BAD_REQUEST)
+            return Response('You have run out of attempts', status=status.HTTP_400_BAD_REQUEST)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 

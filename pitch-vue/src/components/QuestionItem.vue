@@ -34,7 +34,6 @@ export default {
             "answer": this.selected
         }
         this.answers[this.question.id] = selectedAnswer
-        console.log(this.answers)
     }
   }
 };

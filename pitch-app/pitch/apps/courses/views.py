@@ -60,6 +60,15 @@ class ModuleView(viewsets.ModelViewSet):
     queryset = Module.objects.all()
     serializer_class = serializers.ModuleSerializer
     permission_classes = [IsAuthenticated, IsTeacherOrReadOnly]
+    permission_classes_by_action = {
+        'retrieve': [IsAuthenticated]
+    }
+
+    def get_permissions(self):
+        try:
+            return [permission() for permission in self.permission_classes_by_action[self.action]]
+        except KeyError:
+            return [permission() for permission in self.permission_classes]
 
 
 class MaterialView(viewsets.ModelViewSet):
