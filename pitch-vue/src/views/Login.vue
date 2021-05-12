@@ -1,174 +1,115 @@
 <template>
- <div>
-   <form class="login" @submit.prevent="login">
-     <h1>Sign in</h1>
-     <label>Username</label>
-     <input required v-model="username" type="username" placeholder="Name"/>
-     <label>Password</label>
-     <input required v-model="password" type="password" placeholder="Password"/>
-     <hr/>
-     <button type="submit">Login</button>
-   </form>
- </div>
-</template>
+  <div class="container">
+    <h1 class="text-center mt-4 mb-4">Log in</h1>
 
-<script>
-  export default {
-    data(){
-      return {
-        username : "",
-        password : ""
-      }
-    },
-    methods: {
-      login: function () {
-        let username= this.username 
-        let password = this.password
-        this.$store.dispatch('login', { username, password })
-       .then(() => this.$router.push('/pitch'))
-       .catch(err => console.log(err))
-      }
-    }
-  }
-</script>
-<!-- <div id=parent>
-  <div class="col-xl-3">
-    <div id="card">
-      <img
-        id="profile-img"
-        src="//ssl.gstatic.com/accounts/ui/avatar_2x.png"
-        class="profile-img-card"
-      />
-      <form name="form" @submit.prevent="handleLogin">
-        <div class="form-group">
-          <label for="username">Username</label>
-          <input
-            v-model="user.username"
-            v-validate="'required'"
+    <b-form>
+      <b-form-group>
+        <b-form-group id="input-group-1" label="Username" label-for="input-1">
+          <b-form-input
+            id="input-1"
+            v-model="form.username"
             type="text"
-            class="form-control"
-            name="username"
-          />
-          <div
-            v-if="errors.has('username')"
-            class="alert alert-danger"
-            role="alert"
-          >Username is required!</div>
-        </div>
-        <div class="form-group">
-          <label for="password">Password</label>
-          <input
-            v-model="user.password"
-            v-validate="'required'"
+            placeholder="Enter username"
+            required
+            trim
+          ></b-form-input>
+
+          <b-form-text
+            v-for="(message, index) in errorMessages.username"
+            :key="index"
+            :id="`input-1-error-${index}`"
+          >
+            <span class="error-message">{{ message }}</span>
+          </b-form-text>
+        </b-form-group>
+
+        <b-form-group
+          id="input-group-2"
+          label="Password"
+          label-for="input-2"
+          description="Your password must be 8-20 characters long, contain letters andnumbers, and must not contain spaces, special characters, or emoji.">
+          <b-form-input
+            v-model="form.password"
             type="password"
-            class="form-control"
-            name="password"
-          />
-          <div
-            v-if="errors.has('password')"
-            class="alert alert-danger"
-            role="alert"
-          >Password is required!</div>
-        </div>
-        <div class="form-group">
-          <button class="btn btn-primary btn-block" :disabled="loading">
-            <span v-show="loading" class="spinner-border spinner-border-sm"></span>
-            <span>Login</span>
-          </button>
-        </div>
-        <div class="form-group">
-          <div v-if="message" class="alert alert-danger" role="alert">{{message}}</div>
-        </div>
-      </form>
+            id="input-2"
+            placeholder="Enter password"
+            trim
+          ></b-form-input>
+
+          <b-form-text
+            v-for="(message, index) in errorMessages.password"
+            :key="index"
+            :id="`input-2-error-${index}`"
+          >
+            <span class="error-message">{{ message }}</span>
+          </b-form-text>
+        </b-form-group>
+      </b-form-group>
+    </b-form>
+
+    <div class="row mt-4 justify-content-center">
+      <b-link href="/pitch/register" class="card-link">Register</b-link>
     </div>
+
+    <div class="row mt-4 justify-content-center">
+      <b-button v-on:click.prevent="login" variant="secondary">Submit</b-button>
+    </div>
+
+    <b-modal id="error-modal" hide-header hide-footer>
+      <div class="d-block text-center">
+        <h4 class="mb-4">Error</h4>
+        <div v-for="(message, index) in this.errorMessages" :key="index">{{ message }}</div>
+      </div>
+      <b-button class="mt-4" block @click="$bvModal.hide('error-modal')">Ok</b-button>
+    </b-modal>
   </div>
-</div>
 </template>
 
 <script>
-import User from '../models/user';
+import axios from "axios";
 
 export default {
-  name: 'Login',
+  props: {
+    isLoggedIn: Boolean,
+  },
   data() {
     return {
-      user: new User('', ''),
-      loading: false,
-      message: ''
+      form: {
+        username: "",
+        password: "",
+      },
+      errorMessages: {},
     };
   },
-  computed: {
-    loggedIn() {
-      return this.$store.state.auth.status.loggedIn;
-    }
-  },
-  created() {
-    if (this.loggedIn) {
-      this.$router.push('/');
-    }
-  },
   methods: {
-    handleLogin() {
-      this.loading = true;
-      this.$validator.validateAll().then(isValid => {
-        if (!isValid) {
-          this.loading = false;
-          return;
-        }
-
-        if (this.user.username && this.user.password) {
-          this.$store.dispatch('auth/login', this.user).then(
-            () => {
-              this.$router.push('/profile');
-            },
-            error => {
-              this.loading = false;
-              this.message =
-                (error.response && error.response.data) ||
-                error.message ||
-                error.toString();
-            }
+    login() {
+      axios
+        .post("http://127.0.0.1:8000/pitch/auth/login", this.form)
+        .then((response) => {
+          console.log(response.data);
+          localStorage.setItem(
+            "token",
+            JSON.stringify(response.data["auth_token"])
           );
-        }
-      });
-    }
-  }
+          localStorage.setItem("id", response.data["id"]);
+          localStorage.setItem("username", response.data["username"]);
+          localStorage.setItem("email", response.data["email"]);
+          localStorage.setItem("profileId", response.data["profile"]["id"]);
+          localStorage.setItem("role", response.data["profile"]["role"]);
+          this.isLoggedIn = true;
+          this.$router.push("/pitch");
+        })
+        .catch((error) => {
+          if (error.response && error.response.status == 400) {
+            console.log(error.response);
+            this.errorMessages = error.response.data
+
+            if (error.response.data instanceof Array) {
+              this.$bvModal.show('error-modal')
+            }
+          }
+        });
+    },
+  },
 };
 </script>
-
-<style>
-/* label {
-  display: block;
-  margin-top: 10px;
-} */
-
-#card-container.card {
-  max-width: 350px !important;
-  padding: 40px 40px;
-}
-
-#card {
-  background-color: #f7f7f7;
-  padding: 20px 25px 30px;
-  margin: 0 auto 25px;
-  margin-top: 50px;
-  margin-left: auto;
-  margin-right: auto;
-  -moz-border-radius: 2px;
-  -webkit-border-radius: 2px;
-  border-radius: 2px;
-  -moz-box-shadow: 0px 2px 2px rgba(0, 0, 0, 0.3);
-  -webkit-box-shadow: 0px 2px 2px rgba(0, 0, 0, 0.3);
-  box-shadow: 0px 2px 2px rgba(0, 0, 0, 0.3);
-}
-
-#profile-img {
-  width: 30px;
-  height: 30px;
-  margin: 0 auto 10px;
-  display: block;
-  -moz-border-radius: 50%;
-  -webkit-border-radius: 50%;
-  border-radius: 50%;
-}
-</style> -->

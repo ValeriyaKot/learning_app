@@ -1,57 +1,93 @@
 <template>
-    <div class="container mb-3">
-        <h1 class="card-title">
-          {{ course.title }}
-        </h1>
-        <p class="card-text">
-          {{ course.description }}
-        </p>
-        <h3>Modules</h3>
-        <p v-for="module in course.modules" :key="module.id">
-            <ul>
-                <li>
-                    <h4>{{ module.title }}</h4>
-                    <div v-for="material in module.materials" :key="material.id">
-                        <p>{{ material.text }}</p>
-                        <b-button size="sm" variant="secondary" href="#">add material</b-button>
-                        <b-button size="sm" variant="outline-secondary" href="#">edit module</b-button>
-                    </div>
-                </li>
-            </ul>
-        </p>
-        <h3>Tests</h3>
-        <p v-for="test in course.tests" :key="test.id">
-            <ul>
-              <li>{{ test.title }}</li>
-                <b-button size="sm" svariant="secondary" :href="`/pitch/tests/${test.id}`">run</b-button>
-                <b-button size="sm" svariant="secondary" href="#">edit</b-button>
-            </ul>
-        </p>
-        <b-button svariant="secondary" href="#">enroll</b-button>
-        <b-button svariant="secondary" href="#">add module</b-button>
-        <b-button svariant="secondary" href="#">add test</b-button>
+  <div class="container">
+    <h1 class="mt-4 mb-4">
+      {{ course.title }}
+    </h1>
+    <h6>
+      {{ course.description }}
+    </h6>
+
+    <h3>Modules</h3>
+
+    <p v-if="isEmptyModules">No content</p>
+    <ol v-else>
+      <li v-for="module in course.modules" :key="module.id">
+        <b-link
+          v-if="isAlreadyEnrolled || isCourseOwner"
+          :href="`/pitch/courses/${course.id}/modules/${module.id}`"
+          class="card-link"
+          >{{ module.title }}</b-link
+        >
+        <span v-else>{{ module.title }}</span>
+      </li>
+    </ol>
+
+    <h3>Tests</h3>
+    <p v-if="isEmptyTests">No content</p>
+    <ol v-else>
+      <li v-for="test in course.tests" :key="test.id">
+        <b-link
+          v-if="isAlreadyEnrolled"
+          :href="`/pitch/courses/${course.id}/tests/${test.id}`"
+          class="card-link"
+          >{{ test.title }}</b-link
+        >
+        <span v-else>{{ test.title }}</span>
+      </li>
+    </ol>
+
+    <b-button v-if="!isAlreadyEnrolled && !isCourseOwner" @click="enroll" svariant="secondary"
+      >enroll</b-button
+    >
   </div>
 </template>
 
 <script>
-import axios from 'axios'
+import axios from "axios";
 export default {
-    name: 'CourseDetail',
-    data() {
-        return {
-            course: {}
-        }
-    },
+  name: "CourseDetail",
+  data() {
+    return {
+      course: {},
+      isAlreadyEnrolled: false,
+      isCourseOwner: false,
+      isEmptyModules: false,
+      isEmptyTests: false
+    };
+  },
+  components: {},
   mounted() {
-    axios
-        .get(`http://127.0.0.1:8000/pitch/courses/${this.$route.params.id}`)
-        .then(response => {
-            this.course = response.data
-            console.log(response)
-        })
-        
+    let currentProfileId = localStorage.getItem("profileId");
 
-    } 
-  }
-    
+    axios
+      .get(`http://127.0.0.1:8000/pitch/courses/${this.$route.params.id}`)
+      .then((response) => {
+        this.course = response.data;
+        console.log(response.data);
+        this.isEmptyModules = this.course.modules.length == 0;
+        this.isEmptyTests = this.course.tests.length == 0;
+        this.isAlreadyEnrolled = this.course.students.some(s => s.id == currentProfileId);
+        this.isCourseOwner = this.course.teacher.id == currentProfileId;
+      });
+  },
+  methods: {
+    enroll() {
+      let token = JSON.parse(localStorage.getItem("token"))["access"];
+      let options = {
+        headers: { Authorization: "Bearer " + token },
+      };
+      axios
+        .post(
+          `http://127.0.0.1:8000/pitch/courses/${this.course.id}/enroll/`,
+          {},
+          options
+        )
+        .then((response) => {
+          console.log(response.data);
+          this.isAlreadyEnrolled = true;
+        })
+        .catch((error) => console.log(error));
+    },
+  },
+};
 </script>

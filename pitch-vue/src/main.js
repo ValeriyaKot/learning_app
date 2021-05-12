@@ -1,7 +1,6 @@
 import Vue from 'vue'
 import App from './App.vue'
 import router from './router'
-import store from './store';
 import axios from 'axios'
 import VeeValidate from 'vee-validate';
 import { library } from '@fortawesome/fontawesome-svg-core';
@@ -34,6 +33,5 @@ if (token) {
 new Vue({
   el: '#app',
   router,
-  store,
   render: h => h(App)
 }).$mount('#app');

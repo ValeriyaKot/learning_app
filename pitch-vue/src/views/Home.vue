@@ -1,26 +1,14 @@
 <template>
-    <div class="home">
-    <div id="jumbotron">
-        <b-jumbotron header="Pitch" bg-variant="light" height: auto>
+    <div class="container">
+        <b-jumbotron class="text-center mt-4 mb-4" header="Pitch" bg-variant="light" height: auto>
             <div class="body">
-                <div class="container">
-                    <h1 class="title">
-                        Welcome to Pitch         
-                    </h1>
-                    <h2 class="subtitle">
-                        Make sure you check out our upcoming events below
-                    </h2>
-                    <b-button variant="secondary" href="#">More Info</b-button>
+                <h1 class="title">
+                    Anywhere, anytime. Start learning today!       
+                </h1>
+                <div class="row mt-4 mb-4 justify-content-center">
+                    <b-button variant="secondary" href="/pitch/courses">More Info</b-button>
                 </div>
             </div>
         </b-jumbotron>
     </div>
-    </div>
-
-
-
 </template>
-
-<style>
-
-</style>
