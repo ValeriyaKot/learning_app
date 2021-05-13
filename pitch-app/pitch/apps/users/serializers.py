@@ -1,9 +1,9 @@
 from django.contrib.auth import get_user_model
-from rest_framework.authtoken.models import Token
 from rest_framework import serializers
 from django.contrib.auth import password_validation
 from django.contrib.auth.models import BaseUserManager
 from .models import Profile
+from rest_framework_simplejwt.tokens import RefreshToken
 
 User = get_user_model()
 
@@ -13,7 +13,7 @@ class ProfileSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Profile
-        fields = ('birthday', 'role', 'user')
+        fields = "__all__"
 
 
 class UserRegisterSerializer(serializers.ModelSerializer):
@@ -41,14 +41,19 @@ class UserLoginSerializer(serializers.Serializer):
 
 class AuthUserSerializer(serializers.ModelSerializer):
     auth_token = serializers.SerializerMethodField()
+    profile = ProfileSerializer(read_only=True)
 
     class Meta:
         model = User
-        fields = ('id', 'username', 'email', 'first_name', 'last_name', 'auth_token')
+        fields = ('id', 'username', 'email', 'first_name', 'last_name', 'auth_token', 'profile')
 
     def get_auth_token(self, obj):
-        token, created = Token.objects.get_or_create(user=obj)
-        return token.key
+        refresh = RefreshToken.for_user(user=obj)
+
+        return {
+            'refresh': str(refresh),
+            'access': str(refresh.access_token),
+        }
 
 
 class PasswordChangeSerializer(serializers.Serializer):

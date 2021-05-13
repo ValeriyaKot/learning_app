@@ -1,17 +1,29 @@
+from django.shortcuts import get_object_or_404
 from rest_framework.views import APIView
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.response import Response
-from rest_framework import status, viewsets, mixins
+from rest_framework import status, viewsets
 from apps.users.models import Profile
 from apps.courses.permissions import IsTeacherOrReadOnly
-from .models import Test, Question, TestResult, StudentAnswer
+from .models import Test, Question, TestResult
 from . import serializers
+from .utils import write_student_answer, calculate_result, check_attempts
+from apps.courses.models import Course
 
 
 class TestView(viewsets.ModelViewSet):
-    queryset = Test.objects.all()
     permission_classes = [IsAuthenticated, IsTeacherOrReadOnly]
     serializer_class = serializers.TestSerializer
+    queryset = Test.objects.all()
+    permission_classes_by_action = {
+        'retrieve': [IsAuthenticated]
+    }
+
+    def get_permissions(self):
+        try:
+            return [permission() for permission in self.permission_classes_by_action[self.action]]
+        except KeyError:
+            return [permission() for permission in self.permission_classes]
 
 
 class QuestionView(viewsets.ModelViewSet):
@@ -30,36 +42,13 @@ class CheckResultView(APIView):
         test = Test.objects.get(pk=data['test_id'])
         serializer = serializers.CheckResultSerializer(data=data)
         if serializer.is_valid():
-            self.__write_student_answer(student_answers, test, profile)
-            result = self.__calculate_result(student_answers)
-            TestResult.objects.create(result=result, profile=profile, test=test)
-            return Response(result, status=status.HTTP_201_CREATED)
+            if check_attempts(profile, test):
+                result = calculate_result(student_answers)
+                test_result = TestResult.objects.create(result=result, profile=profile, test=test)
+                write_student_answer(student_answers, test_result)
+                return Response(result, status=status.HTTP_201_CREATED)
+            return Response('You have run out of attempts', status=status.HTTP_400_BAD_REQUEST)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-    def __write_student_answer(self, student_answers, test, profile):
-        for student_answer in student_answers:
-            correct_answer = ''
-            question_id = student_answer['question_id']
-            question = Question.objects.get(pk=question_id)
-            for answer in question.answers.all():
-                if answer.is_correct:
-                    correct_answer = answer.text
-                StudentAnswer.objects.create(question=question,
-                                             answer=student_answer['answer'],
-                                             correct_answer=correct_answer,
-                                             test=test,
-                                             profile=profile)
-
-    def __calculate_result(self, student_answers):
-        result = 0
-        for student_answer in student_answers:
-            question_id = student_answer['question_id']
-            question = Question.objects.get(pk=question_id)
-            for answer in question.answers.all():
-                if answer.is_correct and answer.text == student_answer['answer']:
-                    result += 1
-
-        return result
 
 
 class TestResultView(APIView):
@@ -71,7 +60,11 @@ class TestResultView(APIView):
         return Response(serializer.data)
 
 
-class StudentAnswersView(mixins.ListModelMixin, viewsets.GenericViewSet):
-    queryset = StudentAnswer.objects.all()
+class TestCourseView(APIView):
     permission_classes = [IsAuthenticated]
-    serializer_class = serializers.AnswersSerializer
+
+    def get(self, request, pk):
+        course = get_object_or_404(Course, pk=pk)
+        tests = Test.objects.filter(course=course)
+        serializer = serializers.TestCourseSerializer(tests, many=True)
+        return Response(serializer.data)
